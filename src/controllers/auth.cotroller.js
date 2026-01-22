@@ -2,6 +2,7 @@ import User from "../models/user.model.js"
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken"
 import { generate_token } from "../config/token.js";
+import multer from "multer"
 
 const jwt_secret_key = process.env.JWT_SECRET
 
@@ -100,4 +101,11 @@ export const logout = async (req,res)=>{
     } catch (error) {
         res.status(500).json(error.message)
     }
+}
+
+
+export const upload_profile = async(req,res)=>{
+console.log(req.file)
+res.json({success:true})
+
 }
