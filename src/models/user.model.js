@@ -28,6 +28,10 @@ const userSchema = new mongoose.Schema({
         profileImage:{
             type:String,
             required:false
+        },
+        public_id:{
+            type:String,
+            unique:true
         }
 
     

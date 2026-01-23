@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken"
 import { generate_token } from "../config/token.js";
 import multer from "multer"
+import uploadImage from "../config/cloudinary.js";
+import mongoose from "mongoose";
 
 const jwt_secret_key = process.env.JWT_SECRET
 
@@ -103,9 +105,28 @@ export const logout = async (req,res)=>{
     }
 }
 
-
 export const upload_profile = async(req,res)=>{
-console.log(req.file)
-res.json({success:true})
+try {
+    const username = req.body.username;
 
+    const user =await User.findOne({username})
+    if(!user)
+    {
+        return res.json({
+            message:"user doesnt exist "
+        })
+    }
+    console.log(req.file.path)
+    const {public_id,url} = await uploadImage("C:/WEB DEVELOPEMENT/BACKEND/authentication/"+req.file.path,user._id)
+    user.public_id = public_id;
+    user.profileImage=url;
+    await user.save();
+
+    console.log("profile image uploaded successfully on cloud ")
+    res.json({
+        message:"profilepic uploaded suceessfully "
+    })
+} catch (error) {
+    res.send(error.message);
+}
 }
