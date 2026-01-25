@@ -1,6 +1,5 @@
 import User from "../models/user.model.js"
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken"
 import { generate_token } from "../config/token.js";
 import multer from "multer"
 import uploadImage from "../config/cloudinary.js";
@@ -10,6 +9,7 @@ const jwt_secret_key = process.env.JWT_SECRET
 
 export const signup = async (req,res)=>{
 try {
+    console.log("got details")
     const {firstname,lastname,username,email,password} = req.body
     
     if(!firstname || !lastname || !username || !email || !password
@@ -31,7 +31,7 @@ try {
     // first hash the password
     const hashedPass = await bcrypt.hash(password,10);
     let profileImage;
-    
+    console.log("got details ")
     if(req.file)
     {   
         
@@ -90,7 +90,7 @@ export const login = async(req,res)=>{
     //after creating the token send the token in cookies 
 
     res.cookie("token",token,{
-        httpOnly:false,
+        httpOnly:true,
         secure:process.env.NODE_ENVIRONMENT=='PRODUCTION',
         sameSite:"strict",
         maxAge:7*24*3600*1000 // millisecond
@@ -115,28 +115,21 @@ export const logout = async (req,res)=>{
     }
 }
 
-export const upload_profile = async(req,res)=>{
-try {
-    const username = req.body.username;
+export const getUserdetails = async (req,res)=>{
+ try {
+    
 
-    const user =await User.findOne({username})
-    if(!user)
+ const user =await User.findById(req.user_id);
+     if(!user)
     {
         return res.json({
-            message:"user doesnt exist "
+            message:"user doesnot exist "
+
         })
     }
-    console.log(req.file.path)
-    const {public_id,url} = await uploadImage("C:/WEB DEVELOPEMENT/BACKEND/authentication/"+req.file.path,user._id)
-    user.public_id = public_id;
-    user.profileImage=url;
-    await user.save();
 
-    console.log("profile image uploaded successfully on cloud ")
-    res.json({
-        message:"profilepic uploaded suceessfully "
-    })
-} catch (error) {
-    res.send(error.message);
-}
+    res.json(user);
+ } catch (error) {
+    res.json(error.message);
+ }
 }
