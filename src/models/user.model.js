@@ -29,12 +29,6 @@ const userSchema = new mongoose.Schema({
             type:String,
             required:false
         },
-        public_id:{
-            type:String,
-            unique:true
-        }
-
-    
 },{
     timestamps:true
 })

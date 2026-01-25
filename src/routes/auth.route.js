@@ -1,15 +1,19 @@
 import express from "express";
 import { login, logout, signup, upload_profile } from "../controllers/auth.cotroller.js";
 import multer from "multer";
+import { Storage , fileFilter } from "../middlewares/multer.js";
 const authRouter = express.Router();
-
-authRouter.post("/signup",signup)
+const upload = multer({
+  storage:Storage,
+  fileFilter
+})
+authRouter.post("/signup",upload.single("profilePic"),signup)
 
 authRouter.post("/login",login)
 
 authRouter.post("/logout",logout)
 
-const upload = multer({dest:"upload/"})
+
 
 authRouter.post("/upload",upload.single("profilePic"),(req,res,next)=>{
       console.log(req.body)

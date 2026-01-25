@@ -17,7 +17,7 @@ try {
     {
         return res.status(400).json({message:"missing required fields"})
     }
-    
+
     const exist = await User.findOne({email});
 
     if(exist)
@@ -30,7 +30,16 @@ try {
     // else user not exist so do signup
     // first hash the password
     const hashedPass = await bcrypt.hash(password,10);
+    let profileImage;
     
+    if(req.file)
+    {   
+        
+        profileImage = await uploadImage("C:/WEB DEVELOPEMENT/BACKEND/authentication/"+req.file.path);
+       
+    }
+    
+
     //now store the details of user
 
     const user = await User.create({
@@ -38,11 +47,12 @@ try {
         lastname,
         username,
         email,
-        password:hashedPass
+        password:hashedPass,
+        profileImage
     })
 
     res.status(201).json({message:"user signup successfully ",userDetails:{
-        firstname,lastname,username,email
+        firstname,lastname,username,email,profileImage
     }})
 
 } catch (error) {

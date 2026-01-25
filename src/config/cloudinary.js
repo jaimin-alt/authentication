@@ -7,24 +7,29 @@ import fs from "fs/promises"
         api_secret: process.env.CLOUD_SECRET_KEY // Click 'View API Keys' above to copy your API secret
     });
 
-const uploadImage = async (filePath,DB_id)=>{
+const uploadImage = async (filePath)=>{
     try {
+
+        if(!filePath)
+        {   
+
+            return null;
+        }
+
+        console.log("found image path ",filePath)
         const result = await cloudinary.uploader.upload(filePath,{
             folder:"profilePic",
             resource_type:"image",
-            public_id:`${DB_id}`
         })
            
         //after uploading the file delete the image in local disk 
 
         await fs.unlink(filePath);
         console.log("file deleted from local disk ")
-        return {
-            "public_id":result.public_id,
-            "url":result.url
-        }
+        return result.url
     } catch (error) {
         console.log(error)
+        await fs.unlink(filePath);
         throw new Error("image couldnt uploaded on cloud ");
     }
 }
